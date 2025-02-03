@@ -7,30 +7,42 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0xf0f0f0, 1);
+renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 
-// Improved Lighting
+// Enhanced Lighting System
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(5, 5, 5).normalize();
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+directionalLight.position.set(3, 5, 2).normalize();
 scene.add(directionalLight);
 
-const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
 scene.add(hemisphereLight);
 
-// Create a bedroom background
+// Background plane with error handling
 const textureLoader = new THREE.TextureLoader();
-const backgroundTexture = textureLoader.load('IMG_1684.jpeg'); // Replace with your texture path
+const backgroundMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
 const backgroundGeometry = new THREE.PlaneGeometry(100, 100);
-const backgroundMaterial = new THREE.MeshBasicMaterial({ map: backgroundTexture });
 const backgroundMesh = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-backgroundMesh.rotation.x = -Math.PI / 2; // Rotate to be horizontal
+backgroundMesh.rotation.x = -Math.PI / 2;
 scene.add(backgroundMesh);
 
-// Model Loading
+textureLoader.load('IMG_1684.jpeg',
+    (texture) => {
+        texture.encoding = THREE.sRGBEncoding;
+        backgroundMaterial.map = texture;
+        backgroundMaterial.needsUpdate = true;
+    },
+    undefined,
+    (err) => {
+        console.error('Error loading background texture:', err);
+        alert('Background image failed to load. Using fallback color.');
+    }
+);
+
+// Model Loading with proper material handling
 const loader = new THREE.GLTFLoader();
 let model;
 
@@ -40,20 +52,22 @@ loader.load(
         model = gltf.scene;
         scene.add(model);
 
-        // Original materials will be used, so no need to set color manually
+        // Proper material initialization
         model.traverse((child) => {
             if (child.isMesh) {
-                // Ensure the model uses its original material
-                child.material.needsUpdate = true; // Update material if needed
+                child.material.envMapIntensity = 0.8;
+                if (child.material.map) {
+                    child.material.map.encoding = THREE.sRGBEncoding;
+                }
             }
         });
 
-        // Adjust model position and scale
-        model.position.set(0, -1, 0);
+        // Adjusted positioning
+        model.position.set(0, 0, 0);
         model.scale.set(1.5, 1.5, 1.5);
         
-        // Adjust camera position
-        camera.position.set(0, 1, 5);
+        // Camera positioning
+        camera.position.set(0, 1.2, 3);
         controls.update();
         
         animate();
@@ -65,23 +79,29 @@ loader.load(
     }
 );
 
-// Controls
+// Enhanced OrbitControls
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.minDistance = 2;
-controls.maxDistance = 10;
+controls.dampingFactor = 0.1;
+controls.minDistance = 1.5;
+controls.maxDistance = 6;
+controls.enablePan = false;
+controls.enableZoom = true;
 
-// Animation
+// Animation loop
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
 }
 
-// Responsive Handling
+// Responsive handling
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// Prevent default touch events
+document.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
