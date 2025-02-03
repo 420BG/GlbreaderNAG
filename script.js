@@ -25,7 +25,7 @@ function init() {
     // Load GLB model (replace 'your-model.glb' with actual filename)
     const loader = new THREE.GLTFLoader();
     loader.load(
-        './your-model.glb',
+        './model.glb',
         (gltf) => {
             model = gltf.scene;
             scene.add(model);
