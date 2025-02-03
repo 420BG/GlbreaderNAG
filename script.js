@@ -7,6 +7,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0xf0f0f0, 1);
 document.body.appendChild(renderer.domElement);
 
 // Improved Lighting
@@ -20,6 +21,15 @@ scene.add(directionalLight);
 const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
 scene.add(hemisphereLight);
 
+// Create a bedroom background
+const textureLoader = new THREE.TextureLoader();
+const backgroundTexture = textureLoader.load('path/to/your/bedroom_texture.jpg'); // Replace with your texture path
+const backgroundGeometry = new THREE.PlaneGeometry(100, 100);
+const backgroundMaterial = new THREE.MeshBasicMaterial({ map: backgroundTexture });
+const backgroundMesh = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+backgroundMesh.rotation.x = -Math.PI / 2; // Rotate to be horizontal
+scene.add(backgroundMesh);
+
 // Model Loading
 const loader = new THREE.GLTFLoader();
 let model;
@@ -29,20 +39,21 @@ loader.load(
     (gltf) => {
         model = gltf.scene;
         scene.add(model);
-        
-        // Remove the color modification code to keep original colors
-        // model.traverse((child) => {
-        //     if (child.isMesh) {
-        //         child.material.color.set(0xff0000);
-        //     }
-        // });
+
+        // Original materials will be used, so no need to set color manually
+        model.traverse((child) => {
+            if (child.isMesh) {
+                // Ensure the model uses its original material
+                child.material.needsUpdate = true; // Update material if needed
+            }
+        });
 
         // Adjust model position and scale
         model.position.set(0, -1, 0);
         model.scale.set(1.5, 1.5, 1.5);
         
         // Adjust camera position
-        camera.position.set(0, 0, 5);
+        camera.position.set(0, 1, 5);
         controls.update();
         
         animate();
@@ -54,4 +65,23 @@ loader.load(
     }
 );
 
-// ... rest of the script.js remains the same ...
+// Controls
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 2;
+controls.maxDistance = 10;
+
+// Animation
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+// Responsive Handling
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
