@@ -4,7 +4,7 @@ function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);  // Ensure renderer size is correct
+    renderer.setSize(window.innerWidth, window.innerHeight);  // Fixed renderer size
     renderer.setClearColor(0xeeeeee);
     document.body.appendChild(renderer.domElement);
 
@@ -18,7 +18,7 @@ function init() {
     // Load model (Ensure the correct model path)
     const loader = new THREE.GLTFLoader();
     loader.load(
-        './model.glb',  // Model path (adjust if the model is elsewhere)
+        './model.glb',  // Ensure this is the correct path
         (gltf) => {
             model = gltf.scene;
             scene.add(model);
@@ -30,7 +30,10 @@ function init() {
             camera.position.z = box.getSize(new THREE.Vector3()).length * 1.5;  // Adjust camera distance
         },
         undefined,
-        (error) => console.error('Model load error:', error)
+        (error) => {
+            console.error('Model load error:', error);
+            document.getElementById('loading').innerText = 'Model failed to load';
+        }
     );
 
     animate();
