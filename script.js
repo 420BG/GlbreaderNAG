@@ -1,47 +1,33 @@
-let scene, camera, renderer, model, controls;
+let scene, camera, renderer, model;
 
 function init() {
     // Scene setup
     scene = new THREE.Scene();
-    
-    // Camera setup (increase initial distance)
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 2, 10); // x, y, z position
-    
+
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 2); // Bring the camera closer
+
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0xeeeeee);
+    renderer.setClearColor(0xeeeeee); // Light gray background
     document.body.appendChild(renderer.domElement);
 
-    // Add lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    // Add lights (CRUCIAL FOR VISIBILITY)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Soft white light
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Bright white light
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
-    // Add OrbitControls for zoom/pan
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-
-    // Load model
+    // Load GLB model
     const loader = new THREE.GLTFLoader();
     loader.load(
-        './model.glb', // REPLACE WITH YOUR MODEL NAME
+        './model.glb', // Replace with your GLB file path
         (gltf) => {
             model = gltf.scene;
-            
-            // Scale model if too small/big
-            model.scale.set(1, 1, 1); // Adjust these values
-            
-            // Center model in view
-            const box = new THREE.Box3().setFromObject(model);
-            const center = box.getCenter(new THREE.Vector3());
-            model.position.sub(center);
-
             scene.add(model);
             animate();
         },
@@ -54,7 +40,6 @@ function init() {
 
 function animate() {
     requestAnimationFrame(animate);
-    controls.update(); // Required for OrbitControls
     renderer.render(scene, camera);
 }
 
@@ -62,4 +47,7 @@ function animate() {
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+init();
