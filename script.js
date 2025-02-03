@@ -30,7 +30,7 @@ function init() {
     // Load model
     const loader = new THREE.GLTFLoader();
     loader.load(
-        './nag.glb', // REPLACE WITH YOUR MODEL NAME
+        './model.glb', // REPLACE WITH YOUR MODEL NAME
         (gltf) => {
             model = gltf.scene;
             
