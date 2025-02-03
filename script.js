@@ -8,6 +8,7 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000, 1); // Black background
 document.body.appendChild(renderer.domElement);
 
 // Enhanced Lighting System
@@ -20,27 +21,6 @@ scene.add(directionalLight);
 
 const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
 scene.add(hemisphereLight);
-
-// Background plane with error handling
-const textureLoader = new THREE.TextureLoader();
-const backgroundMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
-const backgroundGeometry = new THREE.PlaneGeometry(100, 100);
-const backgroundMesh = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-backgroundMesh.rotation.x = -Math.PI / 2;
-scene.add(backgroundMesh);
-
-textureLoader.load('IMG_1684.jpeg',
-    (texture) => {
-        texture.encoding = THREE.sRGBEncoding;
-        backgroundMaterial.map = texture;
-        backgroundMaterial.needsUpdate = true;
-    },
-    undefined,
-    (err) => {
-        console.error('Error loading background texture:', err);
-        alert('Background image failed to load. Using fallback color.');
-    }
-);
 
 // Model Loading with proper material handling
 const loader = new THREE.GLTFLoader();
@@ -55,15 +35,23 @@ loader.load(
         // Proper material initialization
         model.traverse((child) => {
             if (child.isMesh) {
+                // Ensure materials are properly configured
                 child.material.envMapIntensity = 0.8;
+                child.material.needsUpdate = true;
+                
                 if (child.material.map) {
                     child.material.map.encoding = THREE.sRGBEncoding;
                 }
+                
+                // Enable proper transparency handling
+                child.material.transparent = true;
+                child.material.depthWrite = true;
+                child.material.alphaTest = 0.5;
             }
         });
 
-        // Adjusted positioning
-        model.position.set(0, 0, 0);
+        // Adjusted positioning and scale
+        model.position.set(0, -0.5, 0);
         model.scale.set(1.5, 1.5, 1.5);
         
         // Camera positioning
