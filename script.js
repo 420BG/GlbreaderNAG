@@ -7,14 +7,14 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 1); // Set background color to black
+renderer.setClearColor(0xf0f0f0, 1);
 document.body.appendChild(renderer.domElement);
 
 // Improved Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(5, 5, 5).normalize();
 scene.add(directionalLight);
 
@@ -26,23 +26,18 @@ const loader = new THREE.GLTFLoader();
 let model;
 
 loader.load(
-    'model.glb', // Ensure model.glb is in your repository root
+    'model.glb',
     (gltf) => {
         model = gltf.scene;
-
-        // Ensure materials are correctly applied
+        scene.add(model);
+        
+        // Change the color of the model
         model.traverse((child) => {
             if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                if (child.material) {
-                    child.material.needsUpdate = true;
-                }
+                child.material.color.set(0xff0000); // Change to desired color
             }
         });
 
-        scene.add(model);
-        
         // Adjust model position and scale
         model.position.set(0, -1, 0);
         model.scale.set(1.5, 1.5, 1.5);
