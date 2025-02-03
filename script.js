@@ -6,7 +6,7 @@ function init() {
 
     // Camera setup
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 2); // Bring the camera closer
+    camera.position.set(0, 0, 1); // Bring the camera closer (adjusted to 1)
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -28,6 +28,7 @@ function init() {
         './model.glb', // Replace with your GLB file path
         (gltf) => {
             model = gltf.scene;
+            model.scale.set(0.5, 0.5, 0.5); // Scale the model down
             scene.add(model);
             animate();
         },
