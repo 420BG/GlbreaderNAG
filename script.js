@@ -23,7 +23,8 @@ scene.add(hemisphereLight);
 
 // Create a bedroom background
 const textureLoader = new THREE.TextureLoader();
-const backgroundTexture = textureLoader.load('https://drive.google.com/file/d/1mlgZxsQPhREsFFOegmm9PYG4wfQJU2pE/view?usp=drivesdk'); // Replace with your texture path
+const backgroundTexture = textureLoader.load('https://images.pexels.com/
+photos/11125942/pexels-photo-11125942. jpeg'); // Replace with your texture path
 const backgroundGeometry = new THREE.PlaneGeometry(100, 100);
 const backgroundMaterial = new THREE.MeshBasicMaterial({ map: backgroundTexture });
 const backgroundMesh = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
